@@ -1,0 +1,7 @@
+# ── ML / Data ──────────────────────────────────
+-r requirements.txt
+prophet==1.1.5
+scikit-learn==1.4.0
+pandas==2.2.0
+numpy==1.26.4
+shap==0.44.1
