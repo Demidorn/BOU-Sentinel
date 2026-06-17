@@ -1,0 +1,32 @@
+version: "3.9"
+
+# When deploying to staging or production servers, you don't run make up directly. Instead, 
+# you instruct Docker to read the base file, layer this file over it to strip out development hot-reloads, isolate the networks,
+# and use a high-performance ASGI server layout like Gunicorn running Uvicorn workers.
+
+services:
+  # Overriding API for production standards
+  api:
+    network_mode: null # Remove host mode for real production network isolation
+    ports:
+      - "8000:8000"
+    volumes: [] # Remove host file bindings completely (use container embedded code)
+    command: gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
+
+  # Overriding Worker for production standards
+  worker:
+    network_mode: null
+    volumes: []
+    command: celery -A app.tasks.celery_app worker -l info --autoscale=4,2
+
+  beat:
+    network_mode: null
+    volumes: []
+
+  # Overriding Web UI for production standards
+  web:
+    network_mode: null
+    ports:
+      - "3000:3000"
+    volumes: [] # Production builds code compiled directly into image layers
+    command: pnpm start
